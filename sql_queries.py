@@ -105,15 +105,37 @@ time_table_insert = ("""
     DO NOTHING;
 """)
 
+
 # FIND SONGS
 
 song_select = ("""
     SELECT songs.song_id, artists.artist_id 
     FROM (songs JOIN artists ON songs.artist_id = artists.artist_id)
-    WHERE songs.title = %s AND artists.name = %s AND songs.duration = %s
+    WHERE songs.title = %s AND artists.name = %s AND songs.duration = %s;
 """)
+
+# COPY RECORDS FROM TEMP TABLE
+time_migrate = ("""
+    INSERT INTO time
+    SELECT DISTINCT ON(start_time) *
+    FROM time_temp
+    ORDER BY start_time;
+
+    DROP TABLE IF EXISTS time_temp;
+""")
+
+users_migrate = ("""
+    INSERT INTO users
+    SELECT DISTINCT ON(user_id) *
+    FROM users_temp
+    ORDER BY user_id;
+
+    DROP TABLE IF EXISTS users_temp;
+""")
+
 
 # QUERY LISTS
 
 create_table_queries = [songplay_table_create, user_table_create, song_table_create, artist_table_create, time_table_create]
 drop_table_queries = [songplay_table_drop, user_table_drop, song_table_drop, artist_table_drop, time_table_drop]
+migrate_from_temp_table = [time_migrate, users_migrate]
