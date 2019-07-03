@@ -35,6 +35,12 @@ user_table_create = ("""
     );
 """)
 
+user_temp_table_create = ("""
+    CREATE TABLE IF NOT EXISTS users_temp (
+        LIKE users
+    );
+""")
+
 song_table_create = ("""
     CREATE TABLE IF NOT EXISTS songs (
         song_id VARCHAR(100) PRIMARY KEY,
@@ -67,6 +73,12 @@ time_table_create = ("""
     );
 
     COMMENT ON COLUMN time.start_time is 'The value of log.ts';
+""")
+
+time_temp_table_create = ("""
+    CREATE TABLE IF NOT EXISTS time_temp (
+        LIKE time
+    );
 """)
 
 # INSERT RECORDS

@@ -98,7 +98,7 @@ def process_log_file_bulk(cur, filepath):
     column_labels = (['start_time', 'hour', 'day', 'week', 'month', 'year', 'weekday'])
     time_df = pd.DataFrame.from_dict([OrderedDict(zip(column_labels, data)) for data in time_data])
     # bulk insert time records into TEMP table to avoid violating unique constraint on start_time
-    cur.execute('CREATE TABLE IF NOT EXISTS time_temp (LIKE time)')
+    cur.execute(time_temp_table_create)
     bulk_insert_data(cur, time_df, 'time_temp', None)
 
     # process users data
@@ -107,7 +107,7 @@ def process_log_file_bulk(cur, filepath):
     user_df = user_df.astype({'userId': int})
     # user_df['user_id'] = pd.to_numeric(user_df['user_id'], downcast='integer')
     # bulk insert user records into TEMP table to avoid violating unique constraint on user_id
-    cur.execute('CREATE TABLE IF NOT EXISTS users_temp (LIKE users)')
+    cur.execute(user_temp_table_create)
     bulk_insert_data(cur, user_df, 'users_temp', None)
 
     # process songplays data
