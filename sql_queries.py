@@ -149,6 +149,47 @@ users_migrate = ("""
     DROP TABLE IF EXISTS users_temp;
 """)
 
+# Analysis user activities for listening music
+analysis_most_popular_song = ("""
+    SELECT songs.title AS "Song Title", artists.name AS "Artist Name"
+    FROM ( songs JOIN artists ON songs.artist_id = artists.artist_id )
+    WHERE songs.song_id = (
+        SELECT songplays.song_id
+        FROM ( songplays JOIN time ON songplays.start_time = time.start_time )
+        WHERE time.year = %s
+        GROUP BY songplays.song_id
+        ORDER BY COUNT(songplays.song_id) DESC
+        LIMIT 1
+    );
+""")
+
+analysis_most_popular_artist = ("""
+    SELECT artists.name AS "Artist Name", artists.location AS "Location"
+    FROM artists
+    WHERE artists.artist_id = (
+        SELECT songplays.artist_id
+        FROM ( songplays JOIN time ON songplays.start_time = time.start_time )
+        WHERE time.year = %s
+        GROUP BY songplays.artist_id
+        ORDER BY COUNT(songplays.artist_id) DESC
+        LIMIT 1
+    );
+""")
+
+analysis_mean_number_on_different_level = ("""
+    SELECT users.level AS "User Level", CAST(AVG(total.count) AS DECIMAL(10,2)) as "Avarage Number of Songs"
+    FROM users 
+    JOIN 
+        (
+            SELECT songplays.user_id AS id, COUNT(songplays.user_id) AS count
+            FROM ( songplays JOIN time ON songplays.start_time = time.start_time )
+            WHERE time.year = %s
+            GROUP BY songplays.user_id
+            ORDER BY count DESC
+        ) AS total
+    ON users.user_id = total.id
+    GROUP BY users.level;
+""")
 
 # QUERY LISTS
 
