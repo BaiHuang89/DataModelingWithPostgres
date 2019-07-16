@@ -227,18 +227,32 @@ def process_data(cur, conn, filepath, func):
 
 
 def main():
+    # parse the bul option which is no by default.
+    # if bulk is yes, bulk insert data parsed from log files by using copy command;
+    # Otherwise bulk is no, insert data into table row by row.
+    parser = argparse.ArgumentParser()
+    parser.add_argument("bulk", nargs='?', default="no")
+    args = parser.parse_args()
+    if args.bulk == "no":
+        print("\n------------------------------------------------------------\n")
+        print("The bulk option is no, try bulk insert by setting it to yes.")
+        print("\n------------------------------------------------------------\n")
+    
+    # connect to database sparkifydb
     conn = psycopg2.connect("host=127.0.0.1 dbname=sparkifydb user=student password=student")
     cur = conn.cursor()
 
     process_data(cur, conn, filepath='data/song_data', func=process_song_file)
-    # process_data(cur, conn, filepath='data/log_data', func=process_log_file)
-    process_data(cur, conn, filepath='data/log_data', func=process_log_file_bulk)
 
-    # copy data from temp table to real table
-    # Using COPY to insert in bulk can not simply skip unique constraint.
-    for query in migrate_from_temp_table:
-        cur.execute(query)
-        conn.commit()
+    if args.bulk == "yes":
+        process_data(cur, conn, filepath='data/log_data', func=process_log_file_bulk)
+        # copy data from temp table to real table
+        # Using COPY to insert in bulk can not simply skip unique constraint.
+        for query in migrate_from_temp_table:
+            cur.execute(query)
+            conn.commit()
+    else:
+        process_data(cur, conn, filepath='data/log_data', func=process_log_file)
 
     # get the count of records for songplays.
     cur.execute('select * from songplays;')
