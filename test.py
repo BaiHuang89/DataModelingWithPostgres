@@ -77,6 +77,9 @@ def main():
     # do some analysis
     analysis(engine)
 
+    # close all connections
+    engine.dispose()
+
 
 if __name__ == '__main__':
     main()
