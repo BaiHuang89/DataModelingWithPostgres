@@ -131,7 +131,9 @@ time_migrate = ("""
     INSERT INTO time
     SELECT DISTINCT ON(start_time) *
     FROM time_temp
-    ORDER BY start_time;
+    ORDER BY start_time
+    ON CONFLICT (start_time) 
+    DO NOTHING;
 
     DROP TABLE IF EXISTS time_temp;
 """)
@@ -140,7 +142,9 @@ users_migrate = ("""
     INSERT INTO users
     SELECT DISTINCT ON(user_id) *
     FROM users_temp
-    ORDER BY user_id;
+    ORDER BY user_id
+    ON CONFLICT (user_id) 
+    DO NOTHING;
 
     DROP TABLE IF EXISTS users_temp;
 """)
