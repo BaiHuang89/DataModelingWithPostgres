@@ -1,8 +1,22 @@
+# create_tables.py
+# Copyright (C) 2019 Yanru Wang <michelle.yanru.wang@gmail.com> 
+#
+# This module is a part of online course project and is released under
+# the MIT License: http://www.opensource.org/licenses/mit-license.php
+
+"""
+
+Methods to create database and tables before etl process.
+
+"""
+
 import psycopg2
 from sql_queries import create_table_queries, drop_table_queries
 
 
 def create_database():
+    """Create database sparkifydb.
+    """
     # connect to default database
     conn = psycopg2.connect("host=127.0.0.1 dbname=studentdb user=student password=student")
     conn.set_session(autocommit=True)
@@ -23,12 +37,30 @@ def create_database():
 
 
 def drop_tables(cur, conn):
+    """Drop all tables before create.
+
+    Parameters
+    ----------
+    cur: psycopg2.cursor
+    conn: psycopg2.connection
+
+    """
+
     for query in drop_table_queries:
         cur.execute(query)
         conn.commit()
 
 
 def create_tables(cur, conn):
+    """Create all tables.
+
+    Parameters
+    ----------
+    cur: psycopg2.cursor
+    conn: psycopg2.connection
+
+    """
+
     for query in create_table_queries:
         cur.execute(query)
         conn.commit()

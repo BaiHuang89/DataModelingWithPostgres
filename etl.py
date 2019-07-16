@@ -1,3 +1,16 @@
+# etl.py
+# Copyright (C) 2019 Yanru Wang <michelle.yanru.wang@gmail.com> 
+#
+# This module is a part of online course project and is released under
+# the MIT License: http://www.opensource.org/licenses/mit-license.php
+
+"""
+
+Methods to read/process the data in files and write them to database.
+
+"""
+
+import argparse 
 import io
 import os
 import glob
@@ -6,8 +19,20 @@ import pandas as pd
 from sql_queries import *
 from collections import OrderedDict
 
-
 def bulk_insert_data(cur, df, table, columns):
+    """Bulk insert pandas.DataFrame's data to the database table.
+
+    Parameters
+    ----------
+    cur: psycopg2.cursor
+    df: pandas.DataFrame
+    table: string
+        The name of table to insert.
+    columns: array 
+        The name arrays of columns to write.
+
+    """
+
     # new file-like object
     data_buffer = io.StringIO()
     
@@ -29,6 +54,16 @@ def bulk_insert_data(cur, df, table, columns):
     data_buffer.close()
 
 def process_song_file(cur, filepath):
+    """Parse the song file and insert data of songs and artists into database.
+
+    Parameters
+    ----------
+    cur: psycopg2.cursor
+    filepath: string
+        The path of the file to parse.
+
+    """
+
     # open song file
     df = pd.read_json(filepath, lines=True)
 
@@ -42,6 +77,16 @@ def process_song_file(cur, filepath):
 
 
 def process_log_file(cur, filepath):
+    """Parse the log file and insert data of users, time and songplays into tables.
+
+    Parameters
+    ----------
+    cur: psycopg2.cursor
+    filepath: string
+        The path of the file to parse.
+
+    """
+
     # open log file
     df = pd.read_json(filepath, lines=True)
 
@@ -84,6 +129,16 @@ def process_log_file(cur, filepath):
             cur.execute(songplay_table_insert, songplay_data)
 
 def process_log_file_bulk(cur, filepath):
+    """Parse the log file and bulk insert data of users, time and songplays into tables.
+
+    Parameters
+    ----------
+    cur: psycopg2.cursor
+    filepath: string
+        The path of the file to parse.
+
+    """
+    
     # open log file
     df = pd.read_json(filepath, lines=True)
 
@@ -140,6 +195,19 @@ def process_log_file_bulk(cur, filepath):
 
 
 def process_data(cur, conn, filepath, func):
+    """Parse the log file and insert data of users, time and songplays into tables.
+
+    Parameters
+    ----------
+    cur: psycopg2.cursor
+    conn: psycopg2.connection
+    filepath: string
+        The path of the file to parse.
+    func: function
+        The reference of processing function.
+
+    """
+
     # get all files matching extension from directory
     all_files = []
     for root, dirs, files in os.walk(filepath):
